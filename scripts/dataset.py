@@ -77,16 +77,3 @@ def collate_fn(batch):
     image_pad = torch.nn.utils.rnn.pad_sequence(image, batch_first=True)
     target_pad = torch.nn.utils.rnn.pad_sequence(target, batch_first=True)
     return image_pad, target_pad
-
-if __name__ == "__main__":
-    from dotenv import load_dotenv
-    
-    load_dotenv('.env')
-
-    DATA_PATH = os.getenv('DATA_PATH')
-
-    train_dataset = SYNTH90Dataset(path=DATA_PATH, image_binary=True)
-    train_loader = DataLoader(train_dataset, batch_size=3, collate_fn=collate_fn)
-
-    data = next(iter(train_loader))
-    print(data[0].shape)
