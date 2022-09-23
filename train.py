@@ -42,11 +42,29 @@ def main():
     metric = Metric(SYNTH90Dataset.LABEL2CHAR)
 
     model = CRNN(NUM_LAYERS, OUTPUT_SIZE)
-    optimizer = optim.SGD(model.parameters(), lr=LEARNING_RATE)
+    optimizer = optim.RMSprop(model.parameters(), lr=LEARNING_RATE)
     criterion = nn.CTCLoss()
 
     engine = Engine(model, optimizer, criterion, EPOCHS, metric, device)
     engine.training(train_loader, val_loader)
+
+    checkpoints = {
+        'CHAR2LABEL':SYNTH90Dataset.CHAR2LABEL,
+        'LABEL2CHAR':SYNTH90Dataset.LABEL2CHAR,
+        'model':{
+            'state_dict':engine.model.state_dict(),
+            'architecture':model,
+            'image_size':IMAGE_SIZE,
+            'output_size':OUTPUT_SIZE,
+            'num_layers':NUM_LAYERS
+        },
+        'optimizer':{
+            'state_dict':engine.optimizer.state_dict(),
+            'optimizer':optimizer
+        }
+    }
+
+    engine.save_model(checkpoints, nameModel='1.0.0.pth')
 
 if __name__ == "__main__":
     main()

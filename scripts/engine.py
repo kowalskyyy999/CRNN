@@ -99,7 +99,7 @@ class Engine(object):
 
         return loss
 
-    def save_model(self, checkpoint, nameModel, path=''):
+    def save_model(self, checkpoint, nameModel, path='models'):
         if not os.path.exists(path):
             os.makedirs(path)
 
