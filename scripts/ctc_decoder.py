@@ -27,7 +27,7 @@ class CTC_Decoder:
 
     def _greedy_decoder(self, log_probs):
         out = log_probs.argmax(1).detach().cpu().numpy()
-        preds = self.decode_tensor(out, self.decoder)
+        preds = self.decode_tensor(out)
         return preds
 
     def _beam_search_decoder(self, log_probs):
@@ -44,16 +44,16 @@ class CTC_Decoder:
         
         preds = []
         for seq in sequences:
-            preds.append(self.decode_tensor(seq[0], self.decoder))
+            preds.append(self.decode_tensor(seq[0]))
         
         return preds
 
-    def decoder_tensor(list, decoder):
+    def decode_tensor(self,list):
         pred = ''
         then = 0
-        for x in pred:
+        for x in list:
             if then != x:
                 if x > 0:
-                    pred += decoder[x]
+                    pred += self.decoder[x]
             then = x
         return pred

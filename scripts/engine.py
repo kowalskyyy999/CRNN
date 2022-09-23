@@ -1,17 +1,19 @@
 import os
 import logging
 import collections
+from tkinter.messagebox import NO
 from tqdm import tqdm
 
 import torch
 
 class Engine(object):
-    def __init__(self, model, optimizer, criterion, epochs, device='cpu'):
+    def __init__(self, model, optimizer, criterion, epochs, metric=None, device='cpu'):
         self.model = model.to(device)
         self.optimizer = optimizer
         self.criterion = criterion
         self.epochs = epochs
         self.device = device
+        self.metric = metric
 
     def training(self, trainLoader, valLoader=None):
         for epoch in range(self.epochs):
@@ -33,7 +35,11 @@ class Engine(object):
 
                 trainLoss += loss.item() * image.size(0)
 
-                pbar.set_postfix({'Epoch' : epoch+1, 'Train Loss': loss.item()})
+                if self.metric is not None:
+                    accuracy = self.metric(target, logits)
+                    pbar.set_postfix({'Epoch' : epoch+1, 'Train Loss': loss.item(), 'Train Accuracy':accuracy*100})
+                else:
+                    pbar.set_postfix({'Epoch' : epoch+1, 'Train Loss': loss.item()})
 
             trainLoss = trainLoss / len(trainLoader.dataset)
 
@@ -56,10 +62,17 @@ class Engine(object):
 
                 loss = self.calc_loss(logits, target)
 
-                if epoch is not None:
-                    pbar.set_postfix({'Epoch' : epoch+1, 'Validation Loss': loss.item()})
+                if (self.metric is not None) and (epoch is not None):
+                    accuracy = self.metric(target, logits)
+                    result['accuracy'].append(accuracy)
+                    pbar.set_postfix({'Epoch':epoch+1, 'Validation Loss':loss.item(), 'Validation Accuracy': accuracy * 100})
+                
+                elif epoch is not None:
+                    pbar.set_postfix({'Epoch':epoch+1, 'Validation Loss':loss.item()})
+                
                 else:
-                    pbar.set_postfix({'Loss': loss.item()})
+                    pbar.set_postfix({'Loss':loss.item()})
+
 
                 result['logits'].append(logits)
                 result['target'].append(target)

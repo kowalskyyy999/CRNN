@@ -1,3 +1,4 @@
 .env
 *.ipynb
 scripts/__pycache__
+logs

@@ -1,7 +1,6 @@
 import os 
 import sys
 import string
-from tkinter.tix import Tree
 
 from PIL import Image
 
@@ -9,7 +8,7 @@ import torch
 import torchvision.transforms as T
 from torch.utils.data import Dataset, DataLoader
 
-from config import IMAGE_SIZE
+from scripts.config import IMAGE_SIZE
 
 class SYNTH90Dataset(Dataset):
     CHARS = string.ascii_letters \
@@ -32,24 +31,9 @@ class SYNTH90Dataset(Dataset):
 
     def __getitem__(self, index):
         try:
-
-            payload = self.payloads[index]
-            image_path = os.path.join(self.path, payload.split()[0][2:])
-            image = Image.open(image_path).convert('L').resize(IMAGE_SIZE)
-
-            if self.image_binary:
-                image = image.point(lambda x: 0 if x < 128 else 255, '1')
-
-            if self.transform:
-                image = self.transform(image)
-            else:
-                image = T.ToTensor()(image)
-
-            target = self._find_target(payload)
-            target = torch.tensor([self.CHAR2LABEL[c] for c in target], dtype=torch.int32)
-
+            image, target = self._extract_payloads(index)
         except:
-            pass
+            image, target = self._extract_payloads(index+1)
 
         return image, target
 
@@ -71,6 +55,26 @@ class SYNTH90Dataset(Dataset):
 
     def _find_target(self, payload):
         return " ".join(payload.split("_")[1:-1])
+
+    def _extract_payloads(self, index):
+        payload = self.payloads[index]
+        image_path = os.path.join(self.path, payload.split()[0][2:])
+        image = Image.open(image_path).convert('L').resize(IMAGE_SIZE)
+
+        if self.image_binary:
+            image = image.point(lambda x: 0 if x < 128 else 255, '1')
+
+        if self.transform:
+            image = self.transform(image)
+
+        else:
+            image = T.ToTensor()(image)
+
+        target = self._find_target(payload)
+        target = torch.tensor([self.CHAR2LABEL[c] for c in target], dtype=torch.int32)
+
+        return image, target
+
 
 def collate_fn(batch):
     (image, target) = list(zip(*batch))
