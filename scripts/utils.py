@@ -69,3 +69,15 @@ class Metric:
             if t > 0:
                 text += self.map_decoder[t]
         return text
+
+def ConverterTarget(target, map_decoder):
+    new_target = []
+    for gt in target:
+        gt = gt.cpu().numpy()
+        text = ''
+        for t in gt:
+            if t > 0:
+                text += map_decoder[t]
+        new_target.append(text)
+
+    return new_target

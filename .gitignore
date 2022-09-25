@@ -6,3 +6,7 @@ logs
 models
 models/*.pth
 models/*.pt
+testing.py
+*.png
+*.jpg
+*.csv

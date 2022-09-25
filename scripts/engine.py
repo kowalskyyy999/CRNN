@@ -3,6 +3,8 @@ import logging
 import collections
 from tqdm import tqdm
 
+import numpy as np
+
 import torch
 
 class Engine(object):
@@ -87,6 +89,34 @@ class Engine(object):
             logging.info(f"Validation Loss : {valLoss:.2f}")
         
         return result, valLoss
+
+    def predict(self, image):
+        self.model.eval()
+        with torch.no_grad():
+            logits = self.model(image.to(self.device))
+        return logits
+
+    def batch_predict(self, loader):
+        accuracy = []
+        losses = []
+        self.model.eval()
+
+        with torch.no_grad():
+            pbar = tqdm(loader, total=len(loader))
+            for image, target in pbar:
+                image, target = image.to(self.device), target.to(self.device)
+                logits = self.model(image)
+                loss = self.calc_loss(logits, target)
+                acc = self.metric(target, logits)
+
+                pbar.set_postfix({'Testing Loss': loss.item(), 'Testing Accuracy':acc*100})
+                losses.append(loss)
+                accuracy.append(acc)
+
+        accuracy = np.array(accuracy).mean()
+        losses = np.array(losses).mean()
+
+        print(f'Result Testing => {losses:.2f} Loss - {accuracy:.2f} Accuracy')
 
     def calc_loss(self, logits, target):
         T, N, _ = logits.size()

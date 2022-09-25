@@ -18,11 +18,11 @@ class CTC_Decoder:
 
         else:
             sys.exit("Mode not defined!")
-
+        predictions = []
         for log in logits:
-            preds = decoder(log.log_softmax(1))
+            predictions.append(decoder(log.log_softmax(1)))
 
-        return preds
+        return predictions
 
 
     def _greedy_decoder(self, log_probs):
