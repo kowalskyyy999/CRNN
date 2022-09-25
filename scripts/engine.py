@@ -1,7 +1,6 @@
 import os
 import logging
 import collections
-from tkinter.messagebox import NO
 from tqdm import tqdm
 
 import torch
@@ -16,6 +15,7 @@ class Engine(object):
         self.metric = metric
 
     def training(self, trainLoader, valLoader=None):
+        logging.info(f"Training the model with {self.epochs} epochs and {self.device} Device")
         for epoch in range(self.epochs):
             self.model.train()
             trainLoss = 0
@@ -55,7 +55,7 @@ class Engine(object):
         self.model.eval()
         pbar = tqdm(loader, total=len(loader))
         with torch.no_grad():
-            for image, target in tk:
+            for image, target in pbar:
                 image, target = image.to(self.device), target.to(self.device)
 
                 logits = self.model(image)

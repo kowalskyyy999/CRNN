@@ -1,4 +1,5 @@
 import os
+import logging
 
 import torch
 import torch.nn as nn
@@ -29,6 +30,7 @@ def main():
         T.ToTensor()
     ])
 
+    logging.info("Create CRNN Dataset")
     train_dataset = SYNTH90Dataset(DATA_PATH, mode='train', transform=train_transform)
     val_dataset = SYNTH90Dataset(DATA_PATH, mode='val')
     test_dataset = SYNTH90Dataset(DATA_PATH, mode='test')
@@ -41,11 +43,14 @@ def main():
 
     metric = Metric(SYNTH90Dataset.LABEL2CHAR)
 
+    logging.info("Create the CRNN model")
     model = CRNN(NUM_LAYERS, OUTPUT_SIZE)
-    optimizer = optim.RMSprop(model.parameters(), lr=LEARNING_RATE)
+    optimizer = optim.RMSprop(model.parameters(), lr=LEARNING_RATE, weight_decay=WEIGHT_DECAY)
     criterion = nn.CTCLoss()
 
     engine = Engine(model, optimizer, criterion, EPOCHS, metric, device)
+
+    logging.info('Training The Model !')
     engine.training(train_loader, val_loader)
 
     checkpoints = {

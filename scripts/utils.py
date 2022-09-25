@@ -1,6 +1,7 @@
 import os
 import sys
 import time
+import tqdm
 import logging
 
 from scripts.ctc_decoder import CTC_Decoder
@@ -14,8 +15,19 @@ def AccuracyMetric(gt, pred):
     return value / max_len
 
 
-class Logger:
+class TqdmLoggingHandler(logging.Handler):
+    def __init__(self, level=logging.NOTSET):
+        super().__init__(level)
 
+    def emit(self, record):
+        try:
+            msg = self.format(record)
+            tqdm.tqdm.write(msg)
+            self.flush()
+        except Exception:
+            self.handleError(record)
+
+class Logger:
     def cwd(self):
         pwd = os.getcwd()
         return os.path.join(pwd, 'logs')
@@ -31,7 +43,8 @@ class Logger:
             format="%(asctime)s [%(levelname)s] %(message)s",
             handlers=[
                 logging.FileHandler(os.path.join(pwd, file + "-" + timeString + ".out")),
-                logging.StreamHandler(sys.stdout)
+                logging.StreamHandler(sys.stdout),
+                TqdmLoggingHandler()
             ]
         )
 
