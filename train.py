@@ -7,7 +7,7 @@ from torch.utils.data import DataLoader
 import torchvision.transforms as T
 import torch.optim as optim
 
-from scripts.utils import Logger, AccuracyMetric, Metric
+from scripts.utils import Logger, Metric
 from scripts.dataset import SYNTH90Dataset, collate_fn
 from scripts.config import *
 from scripts.model import CRNN
@@ -35,9 +35,9 @@ def main():
     val_dataset = SYNTH90Dataset(DATA_PATH, mode='val')
     test_dataset = SYNTH90Dataset(DATA_PATH, mode='test')
 
-    train_loader = DataLoader(train_dataset, batch_size=TRAIN_BATCH_SIZE, shuffle=True, collate_fn=collate_fn, num_workers=8)
-    val_loader = DataLoader(val_dataset, batch_size=VAL_BATCH_SIZE, shuffle=False, collate_fn=collate_fn, num_workers=8)
-    test_loader = DataLoader(test_dataset, batch_size=TEST_BATCH_SIZE, shuffle=False, collate_fn=collate_fn, num_workers=8)
+    train_loader = DataLoader(train_dataset, batch_size=TRAIN_BATCH_SIZE, shuffle=True, collate_fn=collate_fn, num_workers=NUM_WORKERS)
+    val_loader = DataLoader(val_dataset, batch_size=VAL_BATCH_SIZE, shuffle=False, collate_fn=collate_fn, num_workers=NUM_WORKERS)
+    test_loader = DataLoader(test_dataset, batch_size=TEST_BATCH_SIZE, shuffle=False, collate_fn=collate_fn, num_workers=NUM_WORKERS)
 
     OUTPUT_SIZE = len(SYNTH90Dataset.LABEL2CHAR) + 1
 
@@ -69,7 +69,7 @@ def main():
         }
     }
 
-    engine.save_model(checkpoints, nameModel='1.0.0.pth')
+    engine.save_model(checkpoints, nameModel='1.1.0.pth')
 
 if __name__ == "__main__":
     main()

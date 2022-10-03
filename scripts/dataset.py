@@ -6,7 +6,7 @@ from PIL import Image
 
 import torch
 import torchvision.transforms as T
-from torch.utils.data import Dataset, DataLoader
+from torch.utils.data import Dataset
 
 from scripts.config import IMAGE_SIZE
 
@@ -14,7 +14,7 @@ class SYNTH90Dataset(Dataset):
     CHARS = string.ascii_letters \
         + string.punctuation \
         + string.digits \
-        + ' ' + '★' + '€' + '©' + '°' + '£' + 'É' + '¡' + '¢' + '•' + '®' + 'Ç' + '¥' + '\n'
+        + ' ' + '★' + '€' + '©' + '°' + '£' + 'É' + '¡' + '¢' + '•' + '®' + 'Ç' + '¥' + '\n' + '—' + '\t'
 
     CHAR2LABEL = {char: i+1 for i, char in enumerate(CHARS)}
     LABEL2CHAR = {label: char for char, label in CHAR2LABEL.items()}

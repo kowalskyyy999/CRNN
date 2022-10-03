@@ -10,3 +10,5 @@ testing.py
 *.png
 *.jpg
 *.csv
+retrain.py
+prediction-cred.py

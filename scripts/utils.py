@@ -12,7 +12,7 @@ def AccuracyMetric(gt, pred):
     for x, y in zip(gt, pred):
         if x == y:
             value += 1
-    return value / max_len
+    return (value + 1) / (max_len + 1)
 
 
 class TqdmLoggingHandler(logging.Handler):
